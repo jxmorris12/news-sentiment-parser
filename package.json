@@ -11,6 +11,7 @@
   "dependencies": {
     "express": "^4.15.2",
     "ghost-article-sdk": "^1.2.0",
-    "moment": "^2.18.1"
+    "moment": "^2.18.1",
+    "mongo": "^0.1.0"
   }
 }
