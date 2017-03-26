@@ -62,10 +62,11 @@ ingestService.getSources()
  var manageNewArticleEntries = function(articles) {
   console.log(
     "**** BEGIN ARTICLES **** \n\n",
-    // articles.map(a => a.title), 
-    articles,
+    articles.map(a => a.title),
     "\n\n **** END ARTICLES ****"
   );
+
+  // Next steps: (1) score, (2) strip, and (3) post.
 
  };
 
@@ -150,11 +151,10 @@ ingestService.getSources()
     }))
     .then(_.flatten)
     // Filter out undefined articles.
-    .then(_.filter(x => x))
     // Return non-null articles in callback.
     .then(articles => {
       console.log(`Finished latest articles news ingest at ${Moment().format('LLL')}`)
-      return articles;
+      return articles.filter(x => x);
     })
     .catch(err => console.error(`IngestLatestArticlesJobError`, { err: err }));
 };
