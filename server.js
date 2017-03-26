@@ -10,9 +10,6 @@ var config      = require('./config'),
 
 var app = express();
 
-/* temporary database */ var db = [];
-
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function (req, res) {
@@ -20,7 +17,7 @@ app.get('/', function (req, res) {
 });
 
 app.listen(config.PORT, function () {
-  console.log('Started up News Parsing server on port ', config.PORT);
+  console.log('Started up News Parsing server on port', config.PORT);
 });
 
 
@@ -31,7 +28,6 @@ var ingestService = newsClient.IngestService;
 var parsingService = newsClient.ParsingService;
 var afinnService = newsClient.AFINNModelService;
 var summarizeService = newsClient.SummaryService;
-
 
 /*
  * Get list of sources.
@@ -56,16 +52,21 @@ var parseRawSource = function(source) {
 
 ingestService.getSources()
   .map(source => parseRawSource(source))
-  .then(sources => loadArticlesFromSources(sources));
+  .then(sources => loadArticlesFromSources(sources))
+  .then(articles => manageNewArticleEntries(articles));
 
 /*
  * Handle new additions to database.
  */
  
- var manageNewArticleEntriesInDatabase = function() {
-  console.log("**** BEGIN ARTICLES **** \n\n",
-    db.length,
-    "\n\n **** END ARTICLES ****");
+ var manageNewArticleEntries = function(articles) {
+  console.log(
+    "**** BEGIN ARTICLES **** \n\n",
+    // articles.map(a => a.title), 
+    articles,
+    "\n\n **** END ARTICLES ****"
+  );
+
  };
 
 
@@ -140,22 +141,20 @@ ingestService.getSources()
             articleSourceId: source.id
           };
 
-          // 7) Add article to database
-          db.push(article);
-
           return article;
         })
-        .tap(_article_ => article = _article_)
-        .then(() => article.id);
         // TODO
         // 1) run article through a model to generate topics
         // 2) run article through a model to generate score
       }, { concurrency: 5 })
     }))
     .then(_.flatten)
-    .then(() => {
+    // Filter out undefined articles.
+    .then(_.filter(x => x))
+    // Return non-null articles in callback.
+    .then(articles => {
       console.log(`Finished latest articles news ingest at ${Moment().format('LLL')}`)
-      manageNewArticleEntriesInDatabase();
+      return articles;
     })
     .catch(err => console.error(`IngestLatestArticlesJobError`, { err: err }));
 };
@@ -169,7 +168,7 @@ ingestService.getSources()
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 // URL where server is running
-var url = 'mongodb://localhost:27017/news-api'
+var url = 'mongodb://admin:admin@ds141950.mlab.com:41950/byeass'
 
 MongoClient.connect(url, function (err, db) {
 	if (err) {
