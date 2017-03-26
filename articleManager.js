@@ -209,10 +209,9 @@ var rescoreAllSources = function() {
         const totalVocab = articlesByCurrentSource.reduce((acc, art) => { return art.vocab + acc }, 0);
 
         // (3) Add new sentiment score to source object
-
-        // Average sentiment score.
+          // Average sentiment score.
         sourcesCache[currentSource].sentiment = totalSentiment / articlesByCurrentSource.length; 
-        // Average vocabulary score.
+          // Average vocabulary score.
         sourcesCache[currentSource].vocab = totalVocab / articlesByCurrentSource.length; 
       }
 

@@ -1,10 +1,11 @@
 
-var URL = "http://localhost:3000/sources";
+var sourcesURL = "http://localhost:3000/sources";
 
-$.getJSON(URL, function(raw)  {
+$.getJSON(sourcesURL, function(raw)  {
   // console.log(raw);
   drawChart(raw);
 });
+
 function drawChart(graphdata) {
 
   var xAvg = 0, yAvg = 0;
@@ -129,6 +130,94 @@ function drawChart(graphdata) {
 }
 
 function selectSource (point) {
+
+  var clickedSourceId = point.id;
+  var articlesUrl = "http://localhost:3000/articles/" + clickedSourceId;
+
+  $.getJSON(articlesUrl, function(raw)  {
+    loadBottomGraph(raw, point);
+  });
+
+}
+
+function loadBottomGraph(data, point) {
+
+  var mappedData = data.map(datum => [datum.sentiment, datum.vocab]);
+
+  var source = point.source,
+           x = point.x
+           y = point.y;
+
+   Highcharts.chart('source-detail', {
+       chart: {
+           type: 'scatter',
+           zoomType: 'xy'
+       },
+       title: {
+           text: 'News sources graphed by language and political leaning. Click and drag to zoom'
+       },
+       subtitle: {
+           text: 'Source: Heinz  2003'
+       },
+       xAxis: {
+           title: {
+               enabled: true,
+               text: 'Height (cm)'
+           },
+           startOnTick: true,
+           endOnTick: true,
+           showLastLabel: true
+       },
+       yAxis: {
+           title: {
+               text: 'Weight (kg)'
+           }
+       },
+       legend: {
+           layout: 'vertical',
+           align: 'left',
+           verticalAlign: 'top',
+           x: 100,
+           y: 70,
+           floating: true,
+           backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF',
+           borderWidth: 1
+       },
+       plotOptions: {
+           scatter: {
+               marker: {
+                   radius: 5,
+                   states: {
+                       hover: {
+                           enabled: true,
+                           lineColor: 'rgb(100,100,100)'
+                       }
+                   }
+               },
+               states: {
+                   hover: {
+                       marker: {
+                           enabled: false
+                       }
+                   }
+               },
+               tooltip: {
+                   headerFormat: '<b>{series.name}</b><br>',
+                   pointFormat: '{point.x} x, {point.y} y'
+               }
+           }
+       },
+       series: [{
+           name: 'Conservative',
+           color: 'rgba(223, 83, 83, .5)',
+           data: mappedData
+       }]
+   });
+}
+
+
+
+function loadBottomGraph2(data) {
   var source = point.souce,
            x = point.x
            y = point.y;
@@ -302,4 +391,5 @@ function selectSource (point) {
                          [180.3, 83.2], [180.3, 83.2]]
                  }]
              });
-};
+}
+

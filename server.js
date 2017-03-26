@@ -22,6 +22,13 @@ app.get('/sources', function (req, res) {
     .catch(err => res.error(err || "Unknown error getting sources"));
 });
 
+app.get('/articles/:sourceid', function (req, res) {
+  var sourceid = req.params.sourceid;
+  mongoDb.getObjectsFromCollection("articles", { "articleSourceId": sourceid })
+    .then(articles => res.send(articles))
+    .catch(err => res.error(err || `Unknown error getting articles from sourceid ${sourceid}`));
+});
+
 app.listen(config.PORT, function () {
   console.log('Started up News Parsing server on port', config.PORT);
 });
