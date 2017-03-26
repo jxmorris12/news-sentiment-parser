@@ -16,5 +16,8 @@
     "node-schedule": "^1.2.1",
     "sha1": "^1.1.1",
     "syncprompt": "^1.0.3"
+  },
+  "engines": {
+    "node": "7.7.4"
   }
 }
