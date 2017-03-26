@@ -13,6 +13,7 @@
     "ghost-article-sdk": "^1.2.0",
     "moment": "^2.18.1",
     "mongo": "^0.1.0",
+    "node-schedule": "^1.2.1",
     "sha1": "^1.1.1",
     "syncprompt": "^1.0.3"
   }

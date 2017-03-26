@@ -66,7 +66,7 @@ function drawChart(graphdata) {
           startOnTick: false,
           endOnTick: false,
           title: {
-              text: 'Inflammatory Language'
+              text: 'Language Complexity'
           },
           labels: {
               format: '{value}'
@@ -92,10 +92,10 @@ function drawChart(graphdata) {
 
       tooltip: {
           useHTML: true,
-          headerFormat: '<table>',
+          headerFormat: '<table style="text-align: center">',
           pointFormat: 
               '<tr><th colspan="2"><h3>{point.name}</h3></th></tr>' +
-              '<img src={point.largeLogoUrl} alt="{point.description}" style="width:100px;max-height:80px"/>' +
+              '<img src={point.largeLogoUrl} alt="{point.description}" style="max-width:100px;max-height:80px"/>' +
               '<tr><th>Average Sentiment:</th><td>{point.x}</td></tr>' +
               '<tr><th>Language Severity:</th><td>{point.y}</td></tr>',
           footerFormat: '</table>',
@@ -181,7 +181,7 @@ function loadBottomGraph(data, pointClicked) {
        },
        yAxis: {
            title: {
-               text: 'Inflammatory Language'
+               text: 'Language Complexity'
            }
        },
        legend: {

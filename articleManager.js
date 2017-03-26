@@ -19,10 +19,8 @@ var ingestService = newsClient.IngestService;
 var parsingService = newsClient.ParsingService;
 var afinnService = newsClient.AFINNModelService;
 var summarizeService = newsClient.SummaryService;
-// Load Mongo database
-var mongoDb = new mongoDbService(config.mongoUrl, function() {
-  main();
-});
+// Global Mongo database
+var mongoDb;
 
 /*
  * Get list of sources.
@@ -270,15 +268,24 @@ var scoreArticleVocab = function(article) {
  * Main function that takes user input and runs helpers
  */
 var main = function() {
+  mongoDb = new mongoDbService(config.mongoUrl, function() {
+    // takeUserInput();
+  });
+}
+
+var takeUserInput = function() {
   var sourcesOrArticles;
   do {
     sourcesOrArticles = prompt("\n'D' to download new articles. 'S' to sync sources. 'X' to exit. ").toUpperCase();
   } while(sourcesOrArticles != "D" && sourcesOrArticles != "S" && sourcesOrArticles != "X");
-
   if(sourcesOrArticles == "X") process.exit();
-
   const userDefinedFunction = (sourcesOrArticles == "D") ? loadAllNewArticles : rescoreAllSources;
+  userDefinedFunction().then(() => takeUserInput());
+}
 
-  userDefinedFunction().then(() => main());
-
+module.exports = {
+  syncDatabase: function(db) {
+    mongoDb = db;
+    return loadAllNewArticles().then(() => rescoreAllSources());
+  }
 }
