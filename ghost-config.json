@@ -4,7 +4,7 @@
     "excludedSources": [
       "abc-news-au", "bild", "die-zeit", "der-tagesspiegel", "espn-cric-info", "gruenderszene", "handelsblatt",
       "spiegel-online", "t3n", "the-guardian-au", "the-times-of-india", "wired-de", "wirtschafts-woche",
-      "usa-today", "reddit-r-all", "engadget", "hacker-news"
+      "usa-today", "reddit-r-all", "engadget", "hacker-news", "techcrunch", "the-verge"
     ]
   },
   "articleParsing": {

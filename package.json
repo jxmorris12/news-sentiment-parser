@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.2",
-    "ghost-article-sdk": "^1.2.0"
+    "ghost-article-sdk": "^1.2.0",
+    "moment": "^2.18.1"
   }
 }
