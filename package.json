@@ -1,0 +1,14 @@
+{
+  "name": "news-sentiment-parser",
+  "version": "0.0.1",
+  "description": "a service to download, parse, and POST news articles",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ghost-article-sdk": "^1.2.0"
+  }
+}
