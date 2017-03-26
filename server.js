@@ -1,13 +1,18 @@
 const _ = require('lodash');
 
-var config      = require('./config'),
-    constants   = require('./constants'),
-    express     = require('express')
-    path        = require('path')
-    ghost       = require('ghost-article-sdk')
-    ghostConfig = require('./ghost-config')
-    Moment      = require('moment');
+var config         = require('./config'),
+    constants      = require('./constants'),
+    express        = require('express')
+    path           = require('path'),
+    ghost          = require('ghost-article-sdk'),
+    ghostConfig    = require('./ghost-config'),
+    Moment         = require('moment'),
+    mongoDbService = require('./services/db-service');
 
+
+/*
+ * Create app with expressJS
+ */
 var app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -28,6 +33,8 @@ var ingestService = newsClient.IngestService;
 var parsingService = newsClient.ParsingService;
 var afinnService = newsClient.AFINNModelService;
 var summarizeService = newsClient.SummaryService;
+// Load Mongo database
+var mongoDb = new mongoDbService(config.mongoUrl);
 
 /*
  * Get list of sources.
@@ -50,10 +57,26 @@ var parseRawSource = function(source) {
     };
 }
 
-ingestService.getSources()
-  .map(source => parseRawSource(source))
-  .then(sources => loadArticlesFromSources(sources))
-  .then(articles => manageNewArticleEntries(articles));
+/* 
+ * Get and store sources (for refreshing list of sources in database)
+ */
+var getAndStoreSources = function() {
+  ingestService.getSources()
+    .map(source => parseRawSource(source))
+    .then(sources => postSourcesToDatabase(sources));
+}
+
+// UNCOMMENT THIS LINE TO REPOPULATE DB WITH SOURCE OBJECTS
+ // getAndStoreSources();
+
+/*
+ * Posts a list of <source> objects to "source" collection in database
+ */
+ var postSourcesToDatabase = function(sources) {
+  console.log("posting sources:", sources.length);
+  mongoDb.postToCollection("sources", sources)
+    .then(() => console.log("Successfully posted sources to database."));
+ }
 
 /*
  * Handle new additions to database.
@@ -149,48 +172,12 @@ ingestService.getSources()
         // 2) run article through a model to generate score
       }, { concurrency: 5 })
     }))
+    // Condense to one longer array.
     .then(_.flatten)
-    // Filter out undefined articles.
-    // Return non-null articles in callback.
     .then(articles => {
       console.log(`Finished latest articles news ingest at ${Moment().format('LLL')}`)
+      // Return non-null articles in callback.
       return articles.filter(x => x);
     })
     .catch(err => console.error(`IngestLatestArticlesJobError`, { err: err }));
 };
-
-
-/*
- * Connect to database
- */
-
-// Connect to MongoDB instance
-var mongodb = require('mongodb');
-var MongoClient = mongodb.MongoClient;
-// URL where server is running
-var url = 'mongodb://admin:admin@ds141950.mlab.com:41950/byeass'
-
-MongoClient.connect(url, function (err, db) {
-	if (err) {
-		console.log('couldnt connect error: ', err);
-	} else {
-		console.log('connected to ', url);
-	}
-
-	// Select Article collection (creates collection if not already there)
-	var articles = db.collection('articles');
-
-	// Format json for an article
-	var a1 = {
-		title: 'Foobar',
-		author: 'Bazbar',
-		source: 'google.com',
-		topics: [
-			'abc',
-			'123'
-		]
-	};
-
-	// Insert to Article collection
-	articles.insert(a1);
-});

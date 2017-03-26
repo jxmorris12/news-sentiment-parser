@@ -1,4 +1,5 @@
 {
   "PORT": 3000,
-  "noisyDebugging": true
+  "noisyDebugging": true,
+  "mongoUrl": "mongodb://admin:admin@ds141950.mlab.com:41950/byeass"
 }
