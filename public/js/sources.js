@@ -1,10 +1,30 @@
+
 var URL = "http://localhost:3000/sources";
-var raw, graphdata;
-$.getJSON(URL, function(raw),  {
+
+$.getJSON(URL, function(raw)  {
   // console.log(raw);
   drawChart(raw);
 });
 function drawChart(graphdata) {
+
+  var xAvg = 0, yAvg = 0;
+
+  graphdata.forEach(function(g) {
+    g.x = g.sentiment;
+    g.y = g.vocab;
+
+    xAvg += g.x || 0;
+    yAvg += g.y || 0;
+  });
+
+  xAvg /= graphdata.length;
+  yAvg /= graphdata.length;
+
+  console.log(xAvg, yAvg);
+
+
+  console.log('graphdata:', graphdata);
+
   Highcharts.chart('container', {
 
       chart: {
@@ -33,7 +53,7 @@ function drawChart(graphdata) {
               dashStyle: 'dot',
               width: 2,
               // Get this value from json
-              value: 65,
+              value: xAvg,
               label: {
                   rotation: 0,
                   y: 15,
@@ -61,7 +81,7 @@ function drawChart(graphdata) {
               dashStyle: 'dot',
               width: 2,
               // Get this value from json
-              value: 50,
+              value: yAvg,
               label: {
                   align: 'right',
                   style: {
@@ -77,7 +97,9 @@ function drawChart(graphdata) {
       tooltip: {
           useHTML: true,
           headerFormat: '<table>',
-          pointFormat: '<tr><th colspan="2"><h3>{point.source}</h3></th></tr>' +
+          pointFormat: 
+              '<tr><th colspan="2"><h3>{point.name}</h3></th></tr>' +
+              '<img src={point.largeLogoUrl} alt="{point.description}" style="width:100px;max-height:80px"/>' +
               '<tr><th>pol:</th><td>{point.x}</td></tr>' +
               '<tr><th>sus:</th><td>{point.y}</td></tr>',
           footerFormat: '</table>',
