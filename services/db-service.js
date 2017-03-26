@@ -28,7 +28,7 @@ class MongoDatabase {
                 self.db = db;
                 console.log('connected to ', mongoUrl);
             }
-            callback();
+            if(callback) callback();
         });
     }
 
