@@ -23,7 +23,7 @@ app.get('/sources', function (req, res) {
 });
 
 app.get('/articles/:sourceid', function (req, res) {
-  var sourceid = req.params.sourceid;
+  const sourceid = req.params.sourceid;
   mongoDb.getObjectsFromCollection("articles", { "articleSourceId": sourceid })
     .then(articles => res.send(articles))
     .catch(err => res.error(err || `Unknown error getting articles from sourceid ${sourceid}`));
