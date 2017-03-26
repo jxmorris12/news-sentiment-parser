@@ -1,12 +1,15 @@
 var config      = require('./config'),
     express     = require('express')
+    path        = require('path')
     ghost       = require('ghost-article-sdk')
     ghostConfig = require('./ghost-config');
 
 var app = express();
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/', function (req, res) {
-  res.send('Hello World!')
+  res.sendFile(path.join(__dirname + '/index.html'));
 });
 
 app.listen(config.PORT, function () {
@@ -55,3 +58,35 @@ ingestService.getSources()
 /*
  * Get sources
  */
+
+// Connect to MongoDB instance
+var mongodb = require('mongodb');
+var MongoClient = mongodb.MongoClient;
+// URL where server is running
+var url = 'mongodb://localhost:27017/news-api'
+
+MongoClient.connect(url, function (err, db) {
+	if (err) {
+		console.log('couldnt connect error: ', err);
+	} else {
+		console.log('connected to ', url);
+	}
+
+	// Select Article collection (creates collection if not already there)
+	var articles = db.collection('articles');
+
+	// Format json for an article
+	var a1 = {
+		title: 'Foobar',
+		author: 'Bazbar',
+		source: 'google.com',
+		topics: [
+			'abc',
+			'123'
+		]
+	};
+
+	// Insert to Article collection
+	articles.insert(a1);
+});
+
