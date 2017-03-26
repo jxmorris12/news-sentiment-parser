@@ -17,7 +17,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/sources', function (req, res) {
-  mongoDb.getAllObjectsFromCollection("sources")
+  mongoDb.getObjectsFromCollection("sources")
     .then(sources => res.send(sources))
     .catch(err => res.error(err || "Unknown error getting sources"));
 });
