@@ -1,14 +1,9 @@
 const _ = require('lodash');
 
 var config         = require('./config'),
-    constants      = require('./constants'),
     express        = require('express')
     path           = require('path'),
-    ghost          = require('ghost-article-sdk'),
-    ghostConfig    = require('./ghost-config'),
-    Moment         = require('moment'),
-    mongoDbService = require('./services/db-service')
-    sentiment = require('sentiment');
+    mongoDbService = require('./services/db-service');
 
 /*
  * Create app with expressJS
@@ -19,6 +14,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname + '/index.html'));
+});
+
+app.get('/sources', function (req, res) {
+  mongoDb.getAllObjectsFromCollection("sources")
+    .then(sources => res.send(sources))
+    .catch(err => res.error(err || "Unknown error getting sources"));
 });
 
 app.listen(config.PORT, function () {
