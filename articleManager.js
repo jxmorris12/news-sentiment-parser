@@ -79,6 +79,7 @@ var getAndStoreSources = function() {
     sources.map(source => {
       if (!source.hasSortByLatest) return Promise.resolve();
       // 0) hold article info from news api
+        /* TODO: Option for getting Top or Popular or Recent */
       return ingestService.getLatest({ source: source.id })
       .filter(articleInfo => {
         // 1) filter out non-political-sounding articles
@@ -272,7 +273,7 @@ var scoreArticleVocab = function(article) {
 var main = function() {
   var sourcesOrArticles;
   do {
-    sourcesOrArticles = prompt("\n'D' to download new articles. 'S' to sync sources. 'X' to exit. ");
+    sourcesOrArticles = prompt("\n'D' to download new articles. 'S' to sync sources. 'X' to exit. ").toUpperCase();
   } while(sourcesOrArticles != "D" && sourcesOrArticles != "S" && sourcesOrArticles != "X");
 
   if(sourcesOrArticles == "X") process.exit();
