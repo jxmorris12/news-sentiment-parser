@@ -37,8 +37,8 @@ class MongoDatabase {
         }
     }
 
-    postToCollection(collectionName, docs) {
-        
+    postManyToCollection(collectionName, docs) {
+
         // Check for errors
         this.checkConnected();
 
@@ -46,17 +46,20 @@ class MongoDatabase {
         var collection = this.db.collection(collectionName);
 
         // Post to collection
-        return new Promise(
-            (resolve, reject) => {
-                collection.insert(docs, function(err, result) {
-                    if(err) {
-                        console.error("Error posting documents to collection " + collectionName + ".");
-                        reject(err);
-                    } else {
-                        resolve(result);
-                    }
-                });
-        });
+        return Promise.all(
+            docs.map(doc => new Promise(
+                (resolve, reject) => {
+                    collection.save(doc, function(err, result) {
+                        if(err) {
+                            console.error("Error posting documents to collection " + collectionName + ".");
+                            reject(err);
+                        } else {
+                            resolve(result);
+                        }
+                    });
+            })
+            )
+         );
     }
 
     getObjectsFromCollection(collectionName, params={}) {

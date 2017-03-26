@@ -59,7 +59,7 @@ var getAndStoreSources = function() {
  */
  var postSourcesToDatabase = function(sources) {
   console.log("posting sources:", sources.length);
-  mongoDb.postToCollection("sources", sources)
+  mongoDb.postManyToCollection("sources", sources)
     .then(() => console.log("Successfully posted sources to database."));
  }
 
@@ -118,8 +118,7 @@ var getAndStoreSources = function() {
         .then(() => summarizeService.summarizeContent(articleInfo.title, articleContent))
         .tap(summary => articleSummary = summary)
 
-        // 6) determine if article has already been stored, if not store it (*** temporarily deprecated ***)
-        // .then(() => Db.article.findOne({ where: { srcUrl: articleInfo.url } }))
+        // Map article to our model
         .then(article => {
           article = {
             title: articleInfo.title,
@@ -132,6 +131,7 @@ var getAndStoreSources = function() {
             summary: articleSummary,
             content: articleExtract.content,
             status: 'published',
+            time: article.publishedAt,
             articleSourceId: source.id
           };
 
@@ -161,7 +161,7 @@ var postArticlesToDatabase = function(articles) {
     article._id = sha1(article.srcUrl)
     return article;
   });
-  return mongoDb.postToCollection("articles", articlesWithIds);
+  return mongoDb.postManyToCollection("articles", articlesWithIds);
 }
 
 /*
@@ -186,16 +186,36 @@ var loadAllNewArticles = function() {
  * The function that does it all
  */ 
 var rescoreAllSources = function() {
+  var sourcesCache;
   // (0) Get sources
   mongoDb.getObjectsFromCollection("sources")
   // (1) Get all articles from database each source
     .then(sources => {
-      return Promise.all(
-        sources.map(source => getObjectsFromCollection("articles", { "articleSourceId": source.id }))
-      );
+      sourcesCache = sources;
+      return Promise.all(sources.map(source => mongoDb.getObjectsFromCollection("articles", { "articleSourceId": source.id })));
     })
     // (2) Average both params for all articles
-    .then(something => console.log("got something",something) )
+    .then(articlesBySource => {
+      for(currentSource in articlesBySource) {
+        const articlesByCurrentSource = articlesBySource[currentSource];
+
+        if(articlesByCurrentSource.length == 0) continue;
+
+        const totalSentiment = articlesByCurrentSource.reduce((acc, art) => { return art.sentiment + acc }, 0);
+        const totalVocab = articlesByCurrentSource.reduce((acc, art) => { return art.vocab + acc }, 0);
+
+        // (3) Add new sentiment score to source object
+
+        // Average sentiment score.
+        sourcesCache[currentSource].sentiment = totalSentiment / articlesByCurrentSource.length; 
+        // Average vocabulary score.
+        sourcesCache[currentSource].vocab = totalVocab / articlesByCurrentSource.length; 
+      }
+
+      // (4) Post new sources
+      return mongoDb.postManyToCollection("sources", sourcesCache);
+    })
+    .then(sources => console.log(`Successfully updated scores of ${sourcesCache.length} elements.`))
     // Check for errors
     .catch(err => console.error(`RescoreAllSourcesError`, { err: err }));
 }
@@ -203,7 +223,7 @@ var rescoreAllSources = function() {
 /*
  * Slim down an article before saving it
  */
-const slimmedArticleParams = ["title", "author", "srcUrl", "articleSourceId", "sentiment", "vocab"];
+const slimmedArticleParams = ["title", "author", "srcUrl", "articleSourceId", "sentiment", "vocab", "time"];
 var slimArticle = function(article) {
   var slimmedArticle = {};
   for(var i in slimmedArticleParams) {
