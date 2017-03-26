@@ -88,7 +88,7 @@ function drawChart(graphdata) {
                   style: {
                       fontStyle: 'italic'
                   },
-                  text: 'Avg level of sus',
+                  text: 'Language severity',
                   x: -10
               },
               zIndex: 3
