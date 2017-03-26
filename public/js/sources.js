@@ -42,7 +42,7 @@ function drawChart(graphdata) {
               text: 'Political Leaning'
           },
           labels: {
-              format: '{value} gr'
+              format: '{value}'
           },
           plotLines: [{
               color: 'black',
@@ -69,7 +69,7 @@ function drawChart(graphdata) {
               text: 'Inflammatory Language'
           },
           labels: {
-              format: '{value} gr'
+              format: '{value}'
           },
           maxPadding: 0.2,
           plotLines: [{
