@@ -8,7 +8,7 @@ var config         = require('./config'),
     Moment         = require('moment'),
     mongoDbService = require('./services/db-service'),
     sha1           = require('sha1'),
-    testSentiments = require('sentiment');
+    sentiment      = require('sentiment');
 
 
 // Create news API client.
@@ -158,10 +158,10 @@ var getAndStoreSources = function() {
 
 var postArticlesToDatabase = function(articles) {
   var articlesWithIds = articles.map(article => {
-    article.id = sha1(article.srcUrl)
+    article._id = sha1(article.srcUrl)
     return article;
   });
-  return mongoDbService.postToCollection("articles", articlesWithIds);
+  return mongoDb.postToCollection("articles", articlesWithIds);
 }
 
 /*
@@ -169,7 +169,7 @@ var postArticlesToDatabase = function(articles) {
  */ 
 var loadAllNewArticles = function() {
   // (0) Get sources
-  mongoDb.getAllObjectsFromCollection("sources")
+  mongoDb.getObjectsFromCollection("sources")
   // (1) Get all new articles for each source
     .then(sources => loadArticlesFromSources(sources))
   // (2) Score all articles
@@ -177,7 +177,27 @@ var loadAllNewArticles = function() {
   // (3) Strip out unneeded information
     .then(articles => articles.map(article => slimArticle(article)))
   // (4) Post articles to Mongo, cleverly avoiding duplicates
-    .then(articles => postArticlesToDatabase(articles));
+    .then(articles => postArticlesToDatabase(articles))
+  // Check for errors
+    .catch(err => console.error(`LoadAllNewArticlesError`, { err: err }));
+}
+
+/*
+ * The function that does it all
+ */ 
+var rescoreAllSources = function() {
+  // (0) Get sources
+  mongoDb.getObjectsFromCollection("sources")
+  // (1) Get all articles from database each source
+    .then(sources => {
+      return Promise.all(
+        sources.map(source => getObjectsFromCollection("articles", { "articleSourceId": source.id }))
+      );
+    })
+    // (2) Average both params for all articles
+    .then(something => console.log("got something",something) )
+    // Check for errors
+    .catch(err => console.error(`RescoreAllSourcesError`, { err: err }));
 }
 
 /*
@@ -188,7 +208,7 @@ var slimArticle = function(article) {
   var slimmedArticle = {};
   for(var i in slimmedArticleParams) {
     const param = slimmedArticleParams[i];
-    slimmedArticle.param = articles.param;
+    slimmedArticle[param] = article[param];
   }
   return slimmedArticle;
 }
@@ -197,8 +217,8 @@ var slimArticle = function(article) {
  * Score an article by two metrics -- sentiment & verbal complexity
  */
 var scoreArticle = function(article) {
-  article.sentiment = scoreArticleSentiment(article);
-  article.vocab = scoreArticleSentiment(article);
+  article["sentiment"] = scoreArticleSentiment(article);
+  article["vocab"] = scoreArticleVocab(article);
   return article;
 }
 
@@ -208,7 +228,8 @@ var scoreArticle = function(article) {
 var scoreArticleSentiment = function(article) {
   var strippedContent = parsingService.removeHtmlTags(article.content);
   var rawSentimentScore = sentiment(strippedContent).score;
-  return _.clamp(_.round(rawSentimentScore), -5, 5);
+  return rawSentimentScore;
+  // return _.clamp(_.round(rawSentimentScore), -5, 5);
 }
 
 /* 
@@ -253,11 +274,8 @@ function testSentiments() {
     // afinnService.scoreEmoji(testArticle2.caption).then(t2c => console.log("a2c",t2c));
 
 }
-// testStuff();
-// 
-// 
-// 
 
 setTimeout(function() {
   loadAllNewArticles(); 
+  // rescoreAllSources();
 }, 1500 );

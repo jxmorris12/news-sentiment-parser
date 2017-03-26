@@ -38,6 +38,7 @@ class MongoDatabase {
     }
 
     postToCollection(collectionName, docs) {
+        
         // Check for errors
         this.checkConnected();
 
@@ -58,11 +59,11 @@ class MongoDatabase {
         });
     }
 
-    getAllObjectsFromCollection(collectionName) {
+    getObjectsFromCollection(collectionName, params={}) {
         var collection = this.db.collection(collectionName);
         return new Promise(
             (resolve, reject) => {
-                collection.find({}).toArray(function(err, result) {
+                collection.find(params).toArray(function(err, result) {
                     if(err) {
                         console.error("Error searching collection " + collectionName + ".");
                         reject(err);
@@ -72,6 +73,7 @@ class MongoDatabase {
                 });
         });
     }
+
 }
 
 module.exports = MongoDatabase;
