@@ -8,7 +8,7 @@ class MongoDatabase {
      * @param {ArticleParsingService} parsingService
      * @param {ArticleSummaryService} summaryService
      */
-    constructor (mongoUrl) {
+    constructor (mongoUrl, callback) {
         /*
          * Connect to database at {mongoUrl}
          */
@@ -28,6 +28,7 @@ class MongoDatabase {
                 self.db = db;
                 console.log('connected to ', mongoUrl);
             }
+            callback();
         });
     }
 
