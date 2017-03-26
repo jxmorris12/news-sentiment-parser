@@ -1,5 +1,5 @@
 
-var sourcesURL = "http://localhost:3000/sources";
+var sourcesURL = "/sources";
 
 $.getJSON(sourcesURL, function(raw)  {
   // console.log(raw);
@@ -128,7 +128,7 @@ function drawChart(graphdata) {
 function selectSource (point) {
 
   var clickedSourceId = point.id;
-  var articlesUrl = "http://localhost:3000/articles/" + clickedSourceId;
+  var articlesUrl = "articles/" + clickedSourceId;
 
   $('#sourceDetailsHeader').text(point.name);
 
