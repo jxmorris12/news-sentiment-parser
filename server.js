@@ -41,7 +41,7 @@ var mongoDb = new mongoDbService(config.mongoUrl);
  *  Run job to scrape & save new articles
  */
 var articleManager = require('./articleManager');
-var j = schedule.scheduleJob('*/15 * * * * *', function() { 
+var j = schedule.scheduleJob('*/15 * * * *', function() { 
   // Runs every 15 mins
   console.log('running cronjob')
   articleManager.syncDatabase(mongoDb);

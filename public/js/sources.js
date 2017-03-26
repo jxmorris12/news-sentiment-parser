@@ -34,7 +34,10 @@ function drawChart(graphdata) {
       },
 
       title: {
-          text: 'News sources graphed by language and political leaning. Click and drag to zoom'
+          text: 'News sources graphed by language and political leaning. Click and drag to zoom',
+           style: {
+            'fontSize': '14px'
+          }
       },
       xAxis: {
           gridLineWidth: 1,
