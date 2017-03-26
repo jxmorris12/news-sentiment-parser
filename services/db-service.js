@@ -46,10 +46,25 @@ class MongoDatabase {
 
         // Post to collection
         return new Promise(
-            function(resolve, reject) {
+            (resolve, reject) => {
                 collection.insert(docs, function(err, result) {
                     if(err) {
                         console.error("Error posting documents to collection " + collectionName + ".");
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
+                });
+        });
+    }
+
+    getAllObjectsFromCollection(collectionName) {
+        var collection = this.db.collection(collectionName);
+        return new Promise(
+            (resolve, reject) => {
+                collection.find({}).toArray(function(err, result) {
+                    if(err) {
+                        console.error("Error searching collection " + collectionName + ".");
                         reject(err);
                     } else {
                         resolve(result);

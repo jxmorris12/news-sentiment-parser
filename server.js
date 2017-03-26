@@ -181,3 +181,19 @@ var getAndStoreSources = function() {
     })
     .catch(err => console.error(`IngestLatestArticlesJobError`, { err: err }));
 };
+
+
+/*
+ * The function that does it all
+ */ 
+var loadAllNewArticles = function() {
+  // (1) Get sources
+  mongoDb.getAllObjectsFromCollection("sources")
+    .then(sources => console.log("Got sources from db:", sources));
+
+  // (2) Get all new articles for each source
+}
+
+
+setTimeout(function() {
+loadAllNewArticles(); }, 1500 );
