@@ -1,10 +1,10 @@
 var URL = "http://localhost:3000/sources";
 var raw, graphdata;
 $.getJSON(URL, function(raw),  {
-  console.log(raw);
+  // console.log(raw);
   drawChart(raw);
 });
-function drawChart(data) {
+function drawChart(graphdata) {
   Highcharts.chart('container', {
 
       chart: {
@@ -100,11 +100,9 @@ function drawChart(data) {
               }
           }
       },
-
       series: [{
           data: graphdata
       }]
-
   });
 }
 
