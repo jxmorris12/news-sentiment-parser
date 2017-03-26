@@ -1,5 +1,5 @@
 {
-	"goodkeywords": ["trump","democrat","republican","democrat","representative","senator","obama",
-    "ryan","washington","white house","spicer","sanders","russia","devos","biden"],
+	"goodkeywords": ["trump","democrat","republican","democrat","representative","senator","senate","obama",
+    "ryan","washington","white house","spicer","sanders","russia","devos","biden","election","vote"],
   "badkeywords": ["wizards","capitals","nationals","redskins"]
 }
